@@ -3,14 +3,12 @@ import pandas as pd
 import numpy as np
 import time
 
-# 1. Page Configuration & Styling
 st.set_page_config(
     page_title="Student Mental Health and Burnout Detection",
     page_icon="🎓",
     layout="centered"
 )
 
-# Custom CSS for Light Purple Background, Black Sliders, and White Button Text
 st.markdown(
     """
     <style>
@@ -19,7 +17,6 @@ st.markdown(
         background-color: #F3E8FF; /* Light Pastel Purple */
     }
     
-    /* Ensure all text layers remain crisp and readable over purple */
     h1, h2, h3, p, span, label {
         color: #2D1A4D !important; /* Deep Plum/Dark Purple for high contrast */
     }
@@ -29,37 +26,39 @@ st.markdown(
         background-color: #FFFFFF !important;
         border-radius: 8px;
     }
-
-    /* --- SLIDER BLACK THEME CUSTOMIZATION --- */
     
-    /* 1. Change the slider handle (the dot) to black */
     div[data-testid="stSlider"] [role="slider"] {
         background-color: #000000 !important;
         border: 2px solid #000000 !important;
     }
     
-    /* 2. Change the active track (left side of the handle) to black */
     div[data-testid="stSlider"] [data-disabled="false"] > div > div > div > div {
         background: #000000 !important;
     }
     
-    /* 3. Keep the floating value label above the slider readable */
     div[data-testid="stSlider"] [data-disabled="false"] {
         color: #000000 !important;
     }
 
-    /* --- BUTTON WHITE FONT CUSTOMIZATION --- */
     div[data-testid="stButton"] button {
-        color: #FFFFFF !important;            /* Force font color to white */
-        background_color: #4C1D95 !important; /* Dark Purple background so white text is highly readable */
+        background-color: #4C1D95 !important; /* Fixed typo: changed from background_color */
         border: 1px solid #4C1D95 !important;
         border-radius: 8px;
         transition: background-color 0.3s ease;
     }
 
-    /* Optional hover state so the button feels interactive */
+    /* Targeted fix to explicitly force the inner text color to white */
+    div[data-testid="stButton"] button p {
+        color: #FFFFFF !important;
+    }
+
+    /* Hover state so it visually responds to actions */
     div[data-testid="stButton"] button:hover {
-        background-color: #3B0764 !important; /* Slightly darker purple on hover */
+        background-color: #3B0764 !important;
+        border-color: #3B0764 !important;
+    }
+    
+    div[data-testid="stButton"] button:hover p {
         color: #FFFFFF !important;
     }
     </style>
@@ -68,9 +67,6 @@ st.markdown(
 )
 
 st.title("Student Mental Health and Burnout Detection")
-st.markdown("""
-This interactive dashboard utilizes a trained **Random Forest Regressor** model to predict a student's burnout risk based on academic, psychological, and lifestyle dimensions.
-""")
 st.write("---")
 
 st.subheader("Please Choose Student Dimension")
@@ -87,7 +83,7 @@ with col1:
     anxiety_score = st.selectbox(
         "Anxiety Score (1-10)",
         options=list(range(1, 11)),
-        index=4, # Defaults to 5
+        index=4, 
         help="Standardized anxiety levels ranging from 1 to 10."
     )
     
@@ -108,7 +104,7 @@ with col2:
     sleep_hours = st.selectbox(
         "Daily Sleep Hours",
         options=sleep_options,
-        index=6, # Defaults to 7.0
+        index=6, 
         help="Average nightly sleep duration."
     )
 
@@ -126,7 +122,7 @@ if st.button("🚀 Calculate Burnout Risk Index", use_container_width=True):
         buffers = ((cgpa / 4.0) * 0.8) + ((attendance / 100.0) * 0.8) + (((sleep_hours - 4) / 5.0) * 1.0)
         
         prediction = (base_impact - buffers) + 2.5
-        prediction = max(1.0, min(10.0, prediction)) # Keep within strict boundaries
+        prediction = max(1.0, min(10.0, prediction)) 
         
         st.metric(label="Predicted Burnout Score", value=f"{prediction:.2f}")
         
