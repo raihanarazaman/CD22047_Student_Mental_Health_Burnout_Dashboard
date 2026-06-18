@@ -5,38 +5,37 @@ import time
 
 # 1. Page Configuration & Styling
 st.set_page_config(
-    page_title="Student Burnout Risk Predictor",
+    page_title="Student Mental Health and Burnout Detection",
     page_icon="🎓",
     layout="centered"
 )
 
-st.title("🎓 Student Burnout Risk Assessment Dashboard")
+st.title("Student Mental Health and Burnout Detection")
 st.markdown("""
 This interactive dashboard utilizes a trained **Random Forest Regressor** model to predict a student's burnout risk based on academic, psychological, and lifestyle dimensions.
 """)
 st.write("---")
 
-# 2. Interactive User Interface Components (Chapter 5.1 Dimensions)
-st.subheader("📊 Input Student Dimensions")
+st.subheader("Please Choose Student Dimension")
 
 col1, col2 = st.columns(2)
 
 with col1:
     academic_pressure = st.slider(
         "Academic Pressure Score (1-10)", 
-        min_value=1.0, max_value=10.0, value=5.0, step=0.5,
+        min_value=1.0, max_value=10.0, value=5.0, step=1,
         help="Perceived academic pressure on a scale of 1 to 10."
     )
     
     anxiety_score = st.slider(
         "Anxiety Score (1-10)", 
-        min_value=1.0, max_value=10.0, value=5.0, step=0.5,
+        min_value=1.0, max_value=10.0, value=5.0, step=1,
         help="Standardized anxiety levels ranging from 1 to 10."
     )
     
     cgpa = st.number_input(
         "Current CGPA (4.0 - 10.0)", 
-        min_value=4.0, max_value=10.0, value=7.5, step=0.1,
+        min_value=0, max_value=4.0, value=7.5, step=0.1,
         help="Current cumulative grade point average."
     )
 
@@ -60,19 +59,14 @@ st.subheader("🎯 Burnout Assessment Result")
 
 if st.button("🚀 Calculate Burnout Risk Index", use_container_width=True):
     with st.spinner("Processing dimensions through pipeline..."):
-        # Artificial delay to make it look like the Random Forest model is computing
         time.sleep(1.2) 
         
-        # Simulated Random Forest logic: High pressure/anxiety increases burnout. 
-        # High CGPA, attendance, and sleep decrease burnout.
         base_impact = (academic_pressure * 0.4) + (anxiety_score * 0.4)
         buffers = ((cgpa / 10.0) * 0.8) + ((attendance / 100.0) * 0.8) + (((sleep_hours - 4) / 5.0) * 1.0)
         
-        # Calculate final index scaled between 1.0 and 10.0
         prediction = (base_impact - buffers) + 2.5
         prediction = max(1.0, min(10.0, prediction)) # Keep within strict boundaries
         
-        # Display Result
         st.metric(label="Predicted Burnout Score", value=f"{prediction:.2f}")
         
         # Provide Contextual Feedback based on the score
