@@ -23,19 +23,21 @@ col1, col2 = st.columns(2)
 with col1:
     academic_pressure = st.slider(
         "Academic Pressure Score (1-10)", 
-        min_value=1.0, max_value=10.0, value=5.0, step=1,
+        min_value=1.0, max_value=10.0, value=5.0, step=1.0,
         help="Perceived academic pressure on a scale of 1 to 10."
     )
     
-    anxiety_score = st.slider(
-        "Anxiety Score (1-10)", 
-        min_value=1.0, max_value=10.0, value=5.0, step=1,
+    # CHANGED: Replaced st.slider with st.selectbox for the dropdown functionality
+    anxiety_score = st.selectbox(
+        "Anxiety Score (1-10)",
+        options=list(range(1, 11)), # Generates numbers [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        index=4,                    # Sets default choice to 5 (0-indexed, so index 4 is the 5th element)
         help="Standardized anxiety levels ranging from 1 to 10."
     )
     
     cgpa = st.number_input(
-        "Current CGPA (4.0 - 10.0)", 
-        min_value=0, max_value=4.0, value=7.5, step=0.1,
+        "Current CGPA (0.0 - 4.0)", 
+        min_value=0.0, max_value=4.0, value=3.5, step=0.1,
         help="Current cumulative grade point average."
     )
 
@@ -61,8 +63,9 @@ if st.button("🚀 Calculate Burnout Risk Index", use_container_width=True):
     with st.spinner("Processing dimensions through pipeline..."):
         time.sleep(1.2) 
         
+        # Mathematical Simulation (anxiety_score behaves as a number automatically)
         base_impact = (academic_pressure * 0.4) + (anxiety_score * 0.4)
-        buffers = ((cgpa / 10.0) * 0.8) + ((attendance / 100.0) * 0.8) + (((sleep_hours - 4) / 5.0) * 1.0)
+        buffers = ((cgpa / 4.0) * 0.8) + ((attendance / 100.0) * 0.8) + (((sleep_hours - 4) / 5.0) * 1.0)
         
         prediction = (base_impact - buffers) + 2.5
         prediction = max(1.0, min(10.0, prediction)) # Keep within strict boundaries
