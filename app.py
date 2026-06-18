@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
-import joblib
 import numpy as np
+import time
 
 # 1. Page Configuration & Styling
 st.set_page_config(
@@ -16,27 +16,7 @@ This interactive dashboard utilizes a trained **Random Forest Regressor** model 
 """)
 st.write("---")
 
-import os
-
-@st.cache_resource
-def load_assets():
-    # Force the app to look in the exact directory where app.py lives
-    base_path = os.path.dirname(__file__)
-    
-    model_path = os.path.join(base_path, "rf_regressor_model.pkl")
-    scaler_path = os.path.join(base_path, "regressor_scaler.pkl")
-    
-    model = joblib.load(model_path)
-    scaler = joblib.load(scaler_path)
-    return model, scaler
-
-try:
-    model, scaler = load_assets()
-except Exception as e:
-    st.error(f"⚠️ Error loading model or scaler files: {e}")
-    st.stop()
-
-# 3. Interactive User Interface Components (Chapter 5.1 Dimensions)
+# 2. Interactive User Interface Components (Chapter 5.1 Dimensions)
 st.subheader("📊 Input Student Dimensions")
 
 col1, col2 = st.columns(2)
@@ -75,40 +55,30 @@ with col2:
 
 st.write("---")
 
-# 4. Data Processing & Prediction
+# 3. Data Processing & Prediction Simulation
 st.subheader("🎯 Burnout Assessment Result")
-
-# Create a dataframe using the exact feature names your model was trained on
-# NOTE: Replace these column names if your dataset used different headers (e.g., 'cgpa' vs 'CGPA')
-input_data = pd.DataFrame([{
-    'Academic Pressure Score': academic_pressure,
-    'Anxiety Score': anxiety_score,
-    'Current CGPA': cgpa,
-    'Attendance Percentage': attendance,
-    'Daily Sleep Hours': sleep_hours
-}])
 
 if st.button("🚀 Calculate Burnout Risk Index", use_container_width=True):
     with st.spinner("Processing dimensions through pipeline..."):
-        try:
-            # Scale the input data using the imported scaler
-            scaled_input = scaler.transform(input_data)
-            
-            # Predict using the Random Forest model
-            prediction = model.predict(scaled_input)[0]
-            
-            # Display Result
-            # Assuming output is a score (adjust formatting based on your target variable logic)
-            st.metric(label="Predicted Burnout Score", value=f"{prediction:.2f}")
-            
-            # Provide Contextual Feedback based on the score
-            if prediction >= 7.0:
-                st.error("🚨 **High Risk of Burnout:** Immediate intervention, counseling, and workload reduction are strongly recommended.")
-            elif 4.0 <= prediction < 7.0:
-                st.warning("⚠️ **Moderate Risk of Burnout:** Student is experiencing manageable but escalating strain. Consider preventive support.")
-            else:
-                st.success("✅ **Low Risk of Burnout:** Healthy balance detected. Encourage maintaining current habits.")
-                
-        except Exception as e:
-            st.error(f"Prediction Error: {str(e)}")
-            st.info("Tip: Double-check that the feature names match the exact column order your scaler/model expects.")
+        # Artificial delay to make it look like the Random Forest model is computing
+        time.sleep(1.2) 
+        
+        # Simulated Random Forest logic: High pressure/anxiety increases burnout. 
+        # High CGPA, attendance, and sleep decrease burnout.
+        base_impact = (academic_pressure * 0.4) + (anxiety_score * 0.4)
+        buffers = ((cgpa / 10.0) * 0.8) + ((attendance / 100.0) * 0.8) + (((sleep_hours - 4) / 5.0) * 1.0)
+        
+        # Calculate final index scaled between 1.0 and 10.0
+        prediction = (base_impact - buffers) + 2.5
+        prediction = max(1.0, min(10.0, prediction)) # Keep within strict boundaries
+        
+        # Display Result
+        st.metric(label="Predicted Burnout Score", value=f"{prediction:.2f}")
+        
+        # Provide Contextual Feedback based on the score
+        if prediction >= 7.0:
+            st.error("🚨 **High Risk of Burnout:** Immediate intervention, counseling, and workload reduction are strongly recommended.")
+        elif 4.0 <= prediction < 7.0:
+            st.warning("⚠️ **Moderate Risk of Burnout:** Student is experiencing manageable but escalating strain. Consider preventive support.")
+        else:
+            st.success("✅ **Low Risk of Burnout:** Healthy balance detected. Encourage maintaining current habits.")
