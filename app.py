@@ -3,12 +3,14 @@ import pandas as pd
 import numpy as np
 import time
 
+# 1. Page Configuration & Styling
 st.set_page_config(
     page_title="Student Mental Health and Burnout Detection",
     page_icon="🎓",
     layout="centered"
 )
 
+# Custom CSS for Light Purple Background, Black Sliders, and White Button Text
 st.markdown(
     """
     <style>
@@ -17,6 +19,7 @@ st.markdown(
         background-color: #F3E8FF; /* Light Pastel Purple */
     }
     
+    /* Ensure all text layers remain crisp and readable over purple */
     h1, h2, h3, p, span, label {
         color: #2D1A4D !important; /* Deep Plum/Dark Purple for high contrast */
     }
@@ -26,38 +29,33 @@ st.markdown(
         background-color: #FFFFFF !important;
         border-radius: 8px;
     }
-    
+
+    /* --- SLIDER BLACK THEME CUSTOMIZATION --- */
     div[data-testid="stSlider"] [role="slider"] {
         background-color: #000000 !important;
         border: 2px solid #000000 !important;
     }
-    
     div[data-testid="stSlider"] [data-disabled="false"] > div > div > div > div {
         background: #000000 !important;
     }
-    
     div[data-testid="stSlider"] [data-disabled="false"] {
         color: #000000 !important;
     }
 
+    /* --- BUTTON WHITE FONT CUSTOMIZATION --- */
     div[data-testid="stButton"] button {
-        background-color: #4C1D95 !important; /* Fixed typo: changed from background_color */
+        background-color: #4C1D95 !important; 
         border: 1px solid #4C1D95 !important;
         border-radius: 8px;
         transition: background-color 0.3s ease;
     }
-
-    /* Targeted fix to explicitly force the inner text color to white */
     div[data-testid="stButton"] button p {
         color: #FFFFFF !important;
     }
-
-    /* Hover state so it visually responds to actions */
     div[data-testid="stButton"] button:hover {
         background-color: #3B0764 !important;
         border-color: #3B0764 !important;
     }
-    
     div[data-testid="stButton"] button:hover p {
         color: #FFFFFF !important;
     }
@@ -66,7 +64,10 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-st.title("Student Mental Health and Burnout Detection")
+st.title("Student Mental Health & Mental State Detection")
+st.markdown("""
+This interactive dashboard utilizes multi-dimensional student inputs to calculate predictive markers for both **Academic Burnout** and underlying **Depression Risk**.
+""")
 st.write("---")
 
 st.subheader("Please Choose Student Dimension")
@@ -111,25 +112,41 @@ with col2:
 st.write("---")
 
 # 3. Data Processing & Prediction Simulation
-st.subheader("🎯 Burnout Assessment Result")
+st.subheader("🎯 Mental Health Assessment Results")
 
-if st.button("🚀 Calculate Burnout Risk Index", use_container_width=True):
+if st.button("🚀 Calculate Mental Health Metrics", use_container_width=True):
     with st.spinner("Processing dimensions through pipeline..."):
         time.sleep(1.2) 
         
-        # Mathematical Simulation
-        base_impact = (academic_pressure * 0.4) + (anxiety_score * 0.4)
-        buffers = ((cgpa / 4.0) * 0.8) + ((attendance / 100.0) * 0.8) + (((sleep_hours - 4) / 5.0) * 1.0)
+        # --- 1. BURNOUT INDEX CALCULATION (Driven heavily by academic load)
+        burnout_base = (academic_pressure * 0.4) + (anxiety_score * 0.4)
+        burnout_buffers = ((cgpa / 4.0) * 0.8) + ((attendance / 100.0) * 0.8) + (((sleep_hours - 4) / 5.0) * 1.0)
+        burnout_score = max(1.0, min(10.0, (burnout_base - burnout_buffers) + 2.5))
         
-        prediction = (base_impact - buffers) + 2.5
-        prediction = max(1.0, min(10.0, prediction)) 
+        # --- 2. DEPRESSION INDEX CALCULATION (Driven heavily by psychological/lifestyle strain)
+        # Anxiety and sleep loss have vastly larger weights here than GPA or attendance
+        depression_base = (anxiety_score * 0.6) + (academic_pressure * 0.2)
+        sleep_loss_penalty = ((9.0 - sleep_hours) / 5.0) * 2.0  # Less sleep severely drives depression score up
+        academic_protection = ((cgpa / 4.0) * 0.3) + ((attendance / 100.0) * 0.3)
+        depression_score = max(1.0, min(10.0, (depression_base + sleep_loss_penalty - academic_protection) + 1.5))
         
-        st.metric(label="Predicted Burnout Score", value=f"{prediction:.2f}")
+        # --- DISPLAY RESULTS SIDE-BY-SIDE ---
+        res_col1, res_col2 = st.columns(2)
         
-        # Provide Contextual Feedback based on the score
-        if prediction >= 7.0:
-            st.error("🚨 **High Risk of Burnout:** Immediate intervention, counseling, and workload reduction are strongly recommended.")
-        elif 4.0 <= prediction < 7.0:
-            st.warning("⚠️ **Moderate Risk of Burnout:** Student is experiencing manageable but escalating strain. Consider preventive support.")
-        else:
-            st.success("✅ **Low Risk of Burnout:** Healthy balance detected. Encourage maintaining current habits.")
+        with res_col1:
+            st.metric(label="Predicted Burnout Score", value=f"{burnout_score:.2f}")
+            if burnout_score >= 7.0:
+                st.error("🚨 **High Burnout Risk:** Immediate intervention and workload reduction recommended.")
+            elif 4.0 <= burnout_score < 7.0:
+                st.warning("⚠️ **Moderate Burnout Risk:** Escalating strain. Consider preventive support.")
+            else:
+                st.success("✅ **Low Burnout Risk:** Healthy academic balance.")
+                
+        with res_col2:
+            st.metric(label="Predicted Depression Score", value=f"{depression_score:.2f}")
+            if depression_score >= 7.0:
+                st.error("🚨 **High Depression Risk:** Clinical screening and professional counseling recommended.")
+            elif 4.0 <= depression_score < 7.0:
+                st.warning("⚠️ **Moderate Depression Risk:** Underlying mood disruptions detected. Monitor closely.")
+            else:
+                st.success("✅ **Low Depression Risk:** Emotional baseline appears stable.")
