@@ -121,4 +121,4 @@ if st.button("🚀 Calculate Burnout Risk Index", use_container_width=True):
         elif 4.0 <= prediction < 7.0:
             st.warning("⚠️ **Moderate Risk of Burnout:** Student is experiencing manageable but escalating strain. Consider preventive support.")
         else:
-            st.success("✅ **Low Risk of Burnout
+            st.success("✅ **Low Risk of Burnout:** Healthy balance detected. Encourage maintaining current habits.")
