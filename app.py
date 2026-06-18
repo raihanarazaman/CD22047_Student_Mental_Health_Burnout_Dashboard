@@ -10,6 +10,48 @@ st.set_page_config(
     layout="centered"
 )
 
+# Custom CSS for Light Purple Background and Black Sliders
+st.markdown(
+    """
+    <style>
+    /* Main background color */
+    .stApp {
+        background-color: #F3E8FF; /* Light Pastel Purple */
+    }
+    
+    /* Ensure all text layers remain crisp and readable over purple */
+    h1, h2, h3, p, span, label {
+        color: #2D1A4D !important; /* Deep Plum/Dark Purple for high contrast */
+    }
+    
+    /* Input dropdowns and number input styling */
+    div[data-baseweb="select"], div[data-baseweb="input"] {
+        background-color: #FFFFFF !important;
+        border-radius: 8px;
+    }
+
+    /* --- SLIDER BLACK THEME CUSTOMIZATION --- */
+    
+    /* 1. Change the slider handle (the dot) to black */
+    div[data-testid="stSlider"] [role="slider"] {
+        background-color: #000000 !important;
+        border: 2px solid #000000 !important;
+    }
+    
+    /* 2. Change the active track (left side of the handle) to black */
+    div[data-testid="stSlider"] [data-disabled="false"] > div > div > div > div {
+        background: #000000 !important;
+    }
+    
+    /* 3. Keep the floating value label above the slider readable */
+    div[data-testid="stSlider"] [data-disabled="false"] {
+        color: #000000 !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 st.title("Student Mental Health and Burnout Detection")
 st.markdown("""
 This interactive dashboard utilizes a trained **Random Forest Regressor** model to predict a student's burnout risk based on academic, psychological, and lifestyle dimensions.
@@ -27,11 +69,10 @@ with col1:
         help="Perceived academic pressure on a scale of 1 to 10."
     )
     
-    # CHANGED: Replaced st.slider with st.selectbox for the dropdown functionality
     anxiety_score = st.selectbox(
         "Anxiety Score (1-10)",
-        options=list(range(1, 11)), # Generates numbers [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-        index=4,                    # Sets default choice to 5 (0-indexed, so index 4 is the 5th element)
+        options=list(range(1, 11)),
+        index=4, # Defaults to 5
         help="Standardized anxiety levels ranging from 1 to 10."
     )
     
@@ -48,10 +89,12 @@ with col2:
         help="Class engagement and attendance record."
     )
     
-    sleep_hours = st.slider(
-        "Daily Sleep Hours", 
-        min_value=4.0, max_value=9.0, value=7.0, step=0.5,
-        help="Continuous slider for average nightly sleep duration."
+    sleep_options = list(np.arange(4.0, 9.5, 0.5))
+    sleep_hours = st.selectbox(
+        "Daily Sleep Hours",
+        options=sleep_options,
+        index=6, # Defaults to 7.0
+        help="Average nightly sleep duration."
     )
 
 st.write("---")
@@ -63,7 +106,7 @@ if st.button("🚀 Calculate Burnout Risk Index", use_container_width=True):
     with st.spinner("Processing dimensions through pipeline..."):
         time.sleep(1.2) 
         
-        # Mathematical Simulation (anxiety_score behaves as a number automatically)
+        # Mathematical Simulation
         base_impact = (academic_pressure * 0.4) + (anxiety_score * 0.4)
         buffers = ((cgpa / 4.0) * 0.8) + ((attendance / 100.0) * 0.8) + (((sleep_hours - 4) / 5.0) * 1.0)
         
@@ -78,4 +121,4 @@ if st.button("🚀 Calculate Burnout Risk Index", use_container_width=True):
         elif 4.0 <= prediction < 7.0:
             st.warning("⚠️ **Moderate Risk of Burnout:** Student is experiencing manageable but escalating strain. Consider preventive support.")
         else:
-            st.success("✅ **Low Risk of Burnout:** Healthy balance detected. Encourage maintaining current habits.")
+            st.success("✅ **Low Risk of Burnout
