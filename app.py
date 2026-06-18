@@ -16,18 +16,24 @@ This interactive dashboard utilizes a trained **Random Forest Regressor** model 
 """)
 st.write("---")
 
-# 2. Load the Saved Model and Scaler Safely
+import os
+
 @st.cache_resource
 def load_assets():
-    # Make sure these filenames perfectly match your GitHub repository files!
-    model = joblib.load("rf_regressor_model.pkl")
-    scaler = joblib.load("regressor_scaler.pkl")
+    # Force the app to look in the exact directory where app.py lives
+    base_path = os.path.dirname(__file__)
+    
+    model_path = os.path.join(base_path, "rf_regressor_model.pkl")
+    scaler_path = os.path.join(base_path, "regressor_scaler.pkl")
+    
+    model = joblib.load(model_path)
+    scaler = joblib.load(scaler_path)
     return model, scaler
 
 try:
     model, scaler = load_assets()
 except Exception as e:
-    st.error("⚠️ Error loading model or scaler files. Please ensure 'rf_regressor_model.pkl' and 'regressor_scaler.pkl' are in the same folder.")
+    st.error(f"⚠️ Error loading model or scaler files: {e}")
     st.stop()
 
 # 3. Interactive User Interface Components (Chapter 5.1 Dimensions)
