@@ -10,7 +10,7 @@ st.set_page_config(
     layout="centered"
 )
 
-# Custom CSS for Light Purple Background and Black Sliders
+# Custom CSS for Light Purple Background, Black Sliders, and White Button Text
 st.markdown(
     """
     <style>
@@ -47,13 +47,30 @@ st.markdown(
     div[data-testid="stSlider"] [data-disabled="false"] {
         color: #000000 !important;
     }
+
+    /* --- BUTTON WHITE FONT CUSTOMIZATION --- */
+    div[data-testid="stButton"] button {
+        color: #FFFFFF !important;            /* Force font color to white */
+        background_color: #4C1D95 !important; /* Dark Purple background so white text is highly readable */
+        border: 1px solid #4C1D95 !important;
+        border-radius: 8px;
+        transition: background-color 0.3s ease;
+    }
+
+    /* Optional hover state so the button feels interactive */
+    div[data-testid="stButton"] button:hover {
+        background-color: #3B0764 !important; /* Slightly darker purple on hover */
+        color: #FFFFFF !important;
+    }
     </style>
     """,
     unsafe_allow_html=True
 )
 
 st.title("Student Mental Health and Burnout Detection")
-
+st.markdown("""
+This interactive dashboard utilizes a trained **Random Forest Regressor** model to predict a student's burnout risk based on academic, psychological, and lifestyle dimensions.
+""")
 st.write("---")
 
 st.subheader("Please Choose Student Dimension")
