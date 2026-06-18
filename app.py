@@ -53,9 +53,7 @@ st.markdown(
 )
 
 st.title("Student Mental Health and Burnout Detection")
-st.markdown("""
-This interactive dashboard utilizes a trained **Random Forest Regressor** model to predict a student's burnout risk based on academic, psychological, and lifestyle dimensions.
-""")
+
 st.write("---")
 
 st.subheader("Please Choose Student Dimension")
